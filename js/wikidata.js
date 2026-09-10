@@ -9,7 +9,7 @@ function buildLeagueQuery(league) {
     SELECT ?club ?clubLabel ?stadium ?stadiumLabel ?capacity ?coord WHERE {
       {
         SELECT DISTINCT ?club WHERE {
-          wd:${league.wikidataId} wdt:P710 ?club.
+          wd:${league.wikidataId} wdt:P1923 ?club.
         }
       }
 
@@ -29,8 +29,101 @@ function buildLeagueQuery(league) {
   return query.trim();
 }
 
+export function getAllLeagues() {
+  return [...leagueMap.values()];
+}
+
 export function getLeagueById(leagueId) {
   return leagueMap.get(leagueId) ?? null;
+}
+
+export function registerLeague(league) {
+  if (!league || !league.id) {
+    return null;
+  }
+
+  leagueMap.set(league.id, { ...league, isCustom: Boolean(league.isCustom) });
+  return leagueMap.get(league.id);
+}
+
+export function clearCustomLeagues() {
+  const ids = [...leagueMap.keys()].filter((id) => {
+    const league = leagueMap.get(id);
+    return Boolean(league?.isCustom);
+  });
+
+  ids.forEach((id) => leagueMap.delete(id));
+}
+
+export async function searchLeagueByText(query) {
+  const value = String(query || '').trim();
+  if (!value) {
+    return [];
+  }
+
+  const url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(value)}&language=pl&format=json&origin=*&type=item&limit=10`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Nie udało się wyszukać ligi w Wikidata.');
+  }
+
+  const data = await response.json();
+
+  if (!Array.isArray(data?.search)) {
+    return [];
+  }
+
+  return data.search
+    .filter((item) => item && item.id)
+    .map((item) => ({
+      id: item.id,
+      label: item.label || item.display?.label || item.id,
+      description: item.description || item.display?.description || ''
+    }));
+}
+
+export async function fetchLeagueMetadataByQid(qid) {
+  const value = String(qid || '').trim();
+  if (!value) {
+    throw new Error('Brak identyfikatora ligi.');
+  }
+
+  const query = `
+    SELECT ?league ?leagueLabel ?participants WHERE {
+      VALUES ?league { wd:${value} }
+      OPTIONAL { ?league wdt:P1132 ?participants. }
+      SERVICE wikibase:label {
+        bd:serviceParam wikibase:language "pl,en".
+      }
+    }
+  `;
+
+  const url = `${WIKIDATA_SPARQL_URL}${encodeURIComponent(query)}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/sparql-results+json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Nie udało się pobrać metadanych ligi z Wikidata.');
+  }
+
+  const payload = await response.json();
+  const bindings = payload?.results?.bindings ?? [];
+  const row = bindings[0] ?? {};
+  const label = row?.leagueLabel?.value ?? value;
+  const participants = Number(row?.participants?.value ?? 0);
+
+  return {
+    id: value,
+    name: label,
+    wikidataId: value,
+    participants: Number.isFinite(participants) && participants > 0 ? participants : 0,
+    isCustom: true
+  };
 }
 
 export async function fetchLeagueStadiums(leagueId) {

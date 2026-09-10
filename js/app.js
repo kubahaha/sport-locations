@@ -1,19 +1,49 @@
 import { leagues } from './config.js';
-import { getCachedLeagueData, setCachedLeagueData, getLastSelectedLeague, setLastSelectedLeague } from './cache.js';
-import { fetchLeagueStadiums, getLeagueById } from './wikidata.js';
-import { createLeagueList, setStatusMessage, toggleSidebar } from './ui.js';
+import {
+  getCachedLeagueData,
+  setCachedLeagueData,
+  getLastSelectedLeague,
+  setLastSelectedLeague,
+  getCustomLeagues,
+  setCustomLeagues,
+  clearLeagueCache
+} from './cache.js';
+import {
+  fetchLeagueStadiums,
+  getLeagueById,
+  getAllLeagues,
+  registerLeague,
+  clearCustomLeagues,
+  searchLeagueByText,
+  fetchLeagueMetadataByQid
+} from './wikidata.js';
+import { createLeagueList, setStatusMessage, renderSearchResults, toggleSidebar } from './ui.js';
 import { initMap, renderMarkers, fitMapToStadiums } from './map.js';
 
 const state = {
   selectedLeagueId: null,
   isLoading: false,
-  currentLeagueData: []
+  currentLeagueData: [],
+  customSearchTimer: null
 };
 
 const map = initMap();
 
+function persistCustomLeagues() {
+  const customLeagues = getAllLeagues().filter((league) => Boolean(league?.isCustom));
+  const customMap = Object.fromEntries(customLeagues.map((league) => [league.id, league]));
+  setCustomLeagues(customMap);
+}
+
+function restoreCustomLeagues() {
+  const saved = getCustomLeagues();
+  Object.values(saved).forEach((league) => {
+    registerLeague({ ...league, isCustom: true });
+  });
+}
+
 function getLeagueDisplayData() {
-  return leagues.map((league) => ({
+  return getAllLeagues().map((league) => ({
     ...league,
     resultCount: getCachedLeagueData(league.id)?.length ?? 0
   }));
@@ -123,13 +153,119 @@ function handleHashChange() {
   }
 }
 
+async function handleCustomLeagueSearch() {
+  const input = document.getElementById('custom-league-input');
+  const value = input?.value.trim();
+
+  if (!value) {
+    renderSearchResults([], () => {});
+    return;
+  }
+
+  try {
+    const matches = await searchLeagueByText(value);
+    if (!matches.length) {
+      renderSearchResults([], () => {});
+      setStatusMessage('Nie znaleziono lig dla tego zapytania.', true);
+      return;
+    }
+
+    renderSearchResults(matches, async (selected) => {
+      try {
+        const league = await fetchLeagueMetadataByQid(selected.id);
+        registerLeague(league);
+        persistCustomLeagues();
+        input.value = '';
+        renderSearchResults([], () => {});
+        await selectLeague(league.id);
+      } catch (error) {
+        setStatusMessage(error?.message || 'Nie udało się pobrać danych dla tej ligi.', true);
+      }
+    });
+
+    setStatusMessage('');
+  } catch (error) {
+    renderSearchResults([], () => {});
+    setStatusMessage(error?.message || 'Nie udało się wyszukać ligi w Wikidata.', true);
+  }
+}
+
+function scheduleCustomLeagueSearch() {
+  const input = document.getElementById('custom-league-input');
+  if (!input) return;
+
+  clearTimeout(state.customSearchTimer);
+
+  if (!input.value.trim()) {
+    renderSearchResults([], () => {});
+    return;
+  }
+
+  state.customSearchTimer = setTimeout(async () => {
+    await handleCustomLeagueSearch();
+  }, 250);
+}
+
+async function handleCustomLeagueSubmit() {
+  const input = document.getElementById('custom-league-input');
+  const value = input?.value.trim();
+
+  if (!value) {
+    return;
+  }
+
+  const matches = await searchLeagueByText(value);
+  if (!matches.length) {
+    setStatusMessage('Nie znaleziono lig dla tego zapytania.', true);
+    return;
+  }
+
+  const selected = matches[0];
+  const league = await fetchLeagueMetadataByQid(selected.id);
+  registerLeague(league);
+  persistCustomLeagues();
+  input.value = '';
+  renderSearchResults([], () => {});
+  await selectLeague(league.id);
+}
+
 function bindUi() {
   const toggleButton = document.getElementById('menu-toggle');
+  const customInput = document.getElementById('custom-league-input');
+  const customButton = document.getElementById('custom-league-button');
+  const clearCacheButton = document.getElementById('clear-cache-button');
+
   if (toggleButton) {
     toggleButton.addEventListener('click', () => {
       const sidebar = document.getElementById('sidebar');
       const status = sidebar?.classList.contains('is-open');
       toggleSidebar(!status);
+    });
+  }
+
+  if (customButton && customInput) {
+    customButton.addEventListener('click', async () => {
+      await handleCustomLeagueSubmit();
+    });
+
+    customInput.addEventListener('input', () => {
+      scheduleCustomLeagueSearch();
+    });
+
+    customInput.addEventListener('keydown', async (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        await handleCustomLeagueSubmit();
+      }
+    });
+  }
+
+  if (clearCacheButton) {
+    clearCacheButton.addEventListener('click', () => {
+      clearLeagueCache();
+      clearCustomLeagues();
+      renderLeagueList();
+      setStatusMessage('Pamięć cache została wyczyszczona.');
     });
   }
 
@@ -148,6 +284,7 @@ function bindUi() {
 }
 
 function initialize() {
+  restoreCustomLeagues();
   bindUi();
   renderLeagueList();
   toggleSidebar(window.innerWidth > 780);

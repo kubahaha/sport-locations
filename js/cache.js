@@ -1,5 +1,6 @@
 const CACHE_KEY = 'sport-locations-cache-v1';
 const LAST_LEAGUE_KEY = 'sport-locations-last-league-v1';
+const CUSTOM_LEAGUES_KEY = 'sport-locations-custom-leagues-v1';
 
 function safeRead(key) {
   try {
@@ -59,4 +60,37 @@ export function getLastSelectedLeague() {
 export function setLastSelectedLeague(leagueId) {
   if (!leagueId) return;
   safeWrite(LAST_LEAGUE_KEY, leagueId);
+}
+
+export function getCustomLeagues() {
+  try {
+    const raw = window.sessionStorage.getItem(CUSTOM_LEAGUES_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    return data && typeof data === 'object' ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+export function setCustomLeagues(customLeagues) {
+  try {
+    window.sessionStorage.setItem(CUSTOM_LEAGUES_KEY, JSON.stringify(customLeagues || {}));
+  } catch {
+    // Ignorujemy nieudany zapis custom lig.
+  }
+}
+
+export function clearLeagueCache() {
+  try {
+    window.sessionStorage.removeItem(CACHE_KEY);
+    window.sessionStorage.removeItem(CUSTOM_LEAGUES_KEY);
+  } catch {
+    // Ignorujemy ograniczenia przeglądarki.
+  }
+
+  try {
+    window.localStorage.removeItem(LAST_LEAGUE_KEY);
+  } catch {
+    // Ignorujemy ograniczenia przeglądarki.
+  }
 }

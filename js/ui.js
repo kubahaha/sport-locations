@@ -40,6 +40,32 @@ export function setStatusMessage(message, isError = false) {
   node.classList.toggle('is-error', Boolean(isError));
 }
 
+export function renderSearchResults(results, onSelect) {
+  const container = document.getElementById('search-results');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (!Array.isArray(results) || results.length === 0) {
+    container.classList.remove('is-visible');
+    return;
+  }
+
+  results.forEach((result) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'search-result-item';
+    button.innerHTML = `
+      <span class="search-result-title">${result.label || result.id}</span>
+      <span class="search-result-meta">${result.description || result.id}</span>
+    `;
+    button.addEventListener('click', () => onSelect(result));
+    container.appendChild(button);
+  });
+
+  container.classList.add('is-visible');
+}
+
 export function toggleSidebar(open) {
   const sidebar = document.getElementById('sidebar');
   const toggle = document.getElementById('menu-toggle');

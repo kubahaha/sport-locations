@@ -35,6 +35,21 @@
           </button>
         </div>
 
+        <div class="custom-league">
+          <label for="custom-league-input">Wprowadź własną ligę</label>
+          <div class="custom-league-row">
+            <input
+              id="custom-league-input"
+              type="text"
+              placeholder="np. Ekstraklasa, Q139892146"
+              aria-label="Wprowadź własną ligę"
+            />
+            <button id="custom-league-button" type="button">Szukaj</button>
+          </div>
+          <div id="search-results" class="search-results" aria-live="polite"></div>
+          <button id="clear-cache-button" class="clear-cache-button" type="button">Wyczyść cache</button>
+        </div>
+
         <nav class="league-nav" aria-label="Lista lig">
           <ul class="league-list" id="league-list"></ul>
         </nav>
