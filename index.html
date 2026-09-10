@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mapa stadionów lig sportowych</title>
+    <meta
+      name="description"
+      content="Mapa stadionów klubów rywalizujących w wybranych ligach sportowych."
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="Panel lig">
+        <div class="sidebar-header">
+          <div>
+            <p class="eyebrow">Stadiony</p>
+            <h1>Lig sportowych</h1>
+          </div>
+          <button
+            class="menu-toggle"
+            id="menu-toggle"
+            type="button"
+            aria-label="Otwórz menu"
+            aria-expanded="true"
+          >
+            ☰
+          </button>
+        </div>
+
+        <nav class="league-nav" aria-label="Lista lig">
+          <ul class="league-list" id="league-list"></ul>
+        </nav>
+      </aside>
+
+      <main class="map-panel">
+        <div class="status-bar">
+          <div id="status-message" class="status-message" role="status" aria-live="polite"></div>
+        </div>
+        <div id="map" class="map" aria-label="Mapa z lokalizacjami stadionów"></div>
+      </main>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
