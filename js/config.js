@@ -2,5 +2,6 @@ export const leagues = [
   { id: 'ekstraklasa', name: 'Ekstraklasa', wikidataId: 'Q139892146', participants: 18 },
   { id: '1-liga', name: '1. Liga', wikidataId: 'Q139892278', participants: 18 },
   { id: '2-liga', name: '2. Liga', wikidataId: 'Q139940116', participants: 18 },
-  { id: '3-liga-1', name: '3. Liga (grupa 1)', wikidataId: 'Q141407107', participants: 18 }
+  { id: '3-liga-1', name: '3. Liga (grupa 1)', wikidataId: 'Q141407107', participants: 18 },
+  { id: '3-liga-4', name: '3. Liga (grupa 4)', wikidataId: 'Q141414428', participants: 18 }
 ];
