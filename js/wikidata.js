@@ -4,7 +4,7 @@ const WIKIDATA_SPARQL_URL = 'https://query.wikidata.org/sparql?format=json&query
 
 const leagueMap = new Map(leagues.map((league) => [league.id, league]));
 
-function buildLeagueQuery(league) {
+export function buildLeagueQuery(league) {
   const query = `
     SELECT ?club ?clubLabel ?stadium ?stadiumLabel ?capacity ?coord WHERE {
       {
@@ -124,6 +124,15 @@ export async function fetchLeagueMetadataByQid(qid) {
     participants: Number.isFinite(participants) && participants > 0 ? participants : 0,
     isCustom: true
   };
+}
+
+export function getLeagueQueryUrl(league) {
+  if (!league?.wikidataId) {
+    return '';
+  }
+
+  const query = buildLeagueQuery(league);
+  return `https://query.wikidata.org/#${encodeURIComponent(query)}`;
 }
 
 export async function fetchLeagueStadiums(leagueId) {

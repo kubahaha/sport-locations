@@ -15,7 +15,8 @@ import {
   registerLeague,
   clearCustomLeagues,
   searchLeagueByText,
-  fetchLeagueMetadataByQid
+  fetchLeagueMetadataByQid,
+  getLeagueQueryUrl
 } from './wikidata.js';
 import { createLeagueList, setStatusMessage, renderSearchResults, toggleSidebar } from './ui.js';
 import { initMap, renderMarkers, fitMapToStadiums } from './map.js';
@@ -80,10 +81,26 @@ async function selectLeague(leagueId, { fromHash = false } = {}) {
   await loadLeagueData(league.id);
 }
 
+function openLeagueQueryInNewTab(league) {
+  const url = getLeagueQueryUrl(league);
+  if (!url) {
+    return;
+  }
+
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 function renderLeagueList() {
-  createLeagueList(getLeagueDisplayData(), state.selectedLeagueId, (leagueId) => {
-    selectLeague(leagueId);
-  });
+  createLeagueList(
+    getLeagueDisplayData(),
+    state.selectedLeagueId,
+    (leagueId) => {
+      selectLeague(leagueId);
+    },
+    (league) => {
+      openLeagueQueryInNewTab(league);
+    }
+  );
 }
 
 async function loadLeagueData(leagueId) {

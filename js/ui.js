@@ -1,4 +1,4 @@
-export function createLeagueList(leagueData, selectedLeagueId, onSelect) {
+export function createLeagueList(leagueData, selectedLeagueId, onSelect, onWarningClick) {
   const list = document.getElementById('league-list');
   if (!list) return;
 
@@ -6,6 +6,11 @@ export function createLeagueList(leagueData, selectedLeagueId, onSelect) {
 
   leagueData.forEach((league) => {
     const item = document.createElement('li');
+    item.className = 'league-item';
+
+    const row = document.createElement('div');
+    row.className = 'league-row';
+
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'league-button';
@@ -20,13 +25,29 @@ export function createLeagueList(leagueData, selectedLeagueId, onSelect) {
       <span class="league-name">${league.name}</span>
       <span class="league-meta">
         <span class="league-count">${count} / ${league.participants}</span>
-        ${warning ? '<span class="league-warning">⚠️</span>' : ''}
       </span>
     `;
 
     button.setAttribute('aria-pressed', String(league.id === selectedLeagueId));
     button.addEventListener('click', () => onSelect(league.id));
-    item.appendChild(button);
+
+    row.appendChild(button);
+
+    if (warning) {
+      const warningButton = document.createElement('button');
+      warningButton.type = 'button';
+      warningButton.className = 'league-warning-button';
+      warningButton.setAttribute('aria-label', `Pokaż zapytanie Wikidata dla ligi ${league.name}`);
+      warningButton.title = `Pokaż zapytanie Wikidata dla ligi ${league.name}`;
+      warningButton.textContent = '⚠️';
+      warningButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        onWarningClick?.(league);
+      });
+      row.appendChild(warningButton);
+    }
+
+    item.appendChild(row);
     list.appendChild(item);
   });
 }
@@ -74,6 +95,6 @@ export function toggleSidebar(open) {
 
   sidebar.classList.toggle('is-open', open);
   toggle.setAttribute('aria-expanded', String(open));
-  toggle.textContent = open ? '☰' : '✕';
+  toggle.textContent = open ? '☰' : '☰';
   toggle.setAttribute('aria-label', open ? 'Otwórz menu' : 'Zamknij menu');
 }
