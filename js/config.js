@@ -6,5 +6,6 @@ export const leagues = [
   { id: '3-liga-4', name: '3. Liga (grupa 4)', wikidataId: 'Q141414428', participants: 18 },
   { id: '4-liga-lu', name: '4. Liga (grupa lubelska)', wikidataId: 'Q141416127', participants: 16 },
   { id: 'okregowka-lu', name: 'Klasa okręgowa (grupa lubelska)', wikidataId: 'Q141417681', participants: 14 },
-  { id: 'okregowka-lb', name: 'Klasa okręgowa (grupa bielskopodlaska)', wikidataId: 'Q141431068', participants: 16 }
+  { id: 'okregowka-lb', name: 'Klasa okręgowa (grupa bielskopodlaska)', wikidataId: 'Q141431068', participants: 16 },
+  { id: 'okregowka-lc', name: 'Klasa okręgowa (grupa chełmska)', wikidataId: 'Q141431646', participants: 14 }
 ];
