@@ -72,10 +72,12 @@ function buildPopup(stadium) {
   const stadiumName = stadium?.stadium || 'Nieznany stadion';
   const clubName = stadium?.club || 'Nieznany klub';
   const capacity = formatCapacity(stadium?.capacity);
+  const league = stadium?.leagueName;
 
   const content = `
     <div>
       <h3>${escapeHtml(stadiumName)}</h3>
+      ${league ? `<div class="popup-row"><strong>Liga:</strong> ${escapeHtml(league)}</div>` : ''}
       <div class="popup-row"><strong>Klub:</strong> ${escapeHtml(clubName)}</div>
       ${capacity ? `<div class="popup-row"><strong>Pojemność:</strong> ${escapeHtml(capacity)}</div>` : ''}
     </div>

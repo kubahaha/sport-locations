@@ -1,6 +1,7 @@
 import { leagues } from './config.js';
 
 const WIKIDATA_SPARQL_URL = 'https://query.wikidata.org/sparql?format=json&query=';
+const SPORTS_SEASON_QID = 'Q27020041';
 
 const leagueMap = new Map(leagues.map((league) => [league.id, league]));
 
@@ -55,7 +56,7 @@ export function clearCustomLeagues() {
   ids.forEach((id) => leagueMap.delete(id));
 }
 
-export async function searchLeagueByText(query) {
+export async function searchLeagueByText(query, { fullSearch = false } = {}) {
   const value = String(query || '').trim();
   if (!value) {
     return [];
@@ -74,13 +75,47 @@ export async function searchLeagueByText(query) {
     return [];
   }
 
-  return data.search
+  const results = data.search
     .filter((item) => item && item.id)
     .map((item) => ({
       id: item.id,
       label: item.label || item.display?.label || item.id,
       description: item.description || item.display?.description || ''
     }));
+
+  if (fullSearch || results.length === 0) {
+    return results;
+  }
+
+  const filteredIds = await getSportsSeasonIds(results.map((result) => result.id));
+  return results.filter((result) => filteredIds.has(result.id));
+}
+
+async function getSportsSeasonIds(ids) {
+  const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${encodeURIComponent(ids.join('|'))}&props=claims&format=json&origin=*`;
+  const response = await fetch(url, {
+    method: 'GET'
+  });
+
+  if (!response.ok) {
+    throw new Error('Nie udało się odfiltrować wyników ligi w Wikidata.');
+  }
+
+  const payload = await response.json();
+  if (!payload?.entities || typeof payload.entities !== 'object') {
+    throw new Error('Otrzymano nieprawidłową odpowiedź z Wikidata.');
+  }
+
+  return new Set(
+    Object.entries(payload.entities)
+      .filter(([, entity]) => {
+        const claims = entity?.claims?.P31;
+        return Array.isArray(claims) && claims.some((claim) => {
+          return claim?.mainsnak?.datavalue?.value?.id === SPORTS_SEASON_QID;
+        });
+      })
+      .map(([id]) => id)
+  );
 }
 
 export async function fetchLeagueMetadataByQid(qid) {
@@ -90,9 +125,10 @@ export async function fetchLeagueMetadataByQid(qid) {
   }
 
   const query = `
-    SELECT ?league ?leagueLabel ?participants WHERE {
+    SELECT ?league ?leagueLabel ?participants ?sport ?sportLabel WHERE {
       VALUES ?league { wd:${value} }
       OPTIONAL { ?league wdt:P1132 ?participants. }
+      OPTIONAL { ?league wdt:P641 ?sport. }
       SERVICE wikibase:label {
         bd:serviceParam wikibase:language "pl,en".
       }
@@ -116,12 +152,15 @@ export async function fetchLeagueMetadataByQid(qid) {
   const row = bindings[0] ?? {};
   const label = row?.leagueLabel?.value ?? value;
   const participants = Number(row?.participants?.value ?? 0);
+  const sport = row?.sportLabel?.value || null;
 
   return {
     id: value,
     name: label,
     wikidataId: value,
     participants: Number.isFinite(participants) && participants > 0 ? participants : 0,
+    sport,
+    sportLoaded: true,
     isCustom: true
   };
 }

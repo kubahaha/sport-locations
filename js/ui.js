@@ -1,4 +1,4 @@
-export function createLeagueList(leagueData, selectedLeagueId, onSelect, onWarningClick) {
+export function createLeagueList(leagueData, selectedLeagueIds, onSelect, onWarningClick) {
   const list = document.getElementById('league-list');
   if (!list) return;
 
@@ -14,23 +14,33 @@ export function createLeagueList(leagueData, selectedLeagueId, onSelect, onWarni
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'league-button';
-    if (league.id === selectedLeagueId) {
-      button.classList.add('is-selected');
-    }
+    const isSelected = selectedLeagueIds.has(league.id);
+    if (isSelected) button.classList.add('is-selected');
 
     const count = league.resultCount ?? 0;
     const warning = count < league.participants;
 
     button.innerHTML = `
       <span class="league-name">${league.name}</span>
+      ${league.sport ? `<span class="league-sport">${league.sport}</span>` : ''}
       <span class="league-meta">
         <span class="league-count">${count} / ${league.participants}</span>
       </span>
     `;
 
-    button.setAttribute('aria-pressed', String(league.id === selectedLeagueId));
-    button.addEventListener('click', () => onSelect(league.id));
+    button.setAttribute('aria-pressed', String(isSelected));
+    button.addEventListener('click', () => onSelect(league.id, !isSelected));
 
+    const checkbox = document.createElement('input');
+    checkbox.className = 'league-check';
+    checkbox.type = 'checkbox';
+    checkbox.checked = isSelected;
+    checkbox.setAttribute('aria-label', `Pokaż ligę ${league.name}`);
+    checkbox.addEventListener('change', (event) => {
+      onSelect(league.id, event.target.checked);
+    });
+
+    row.appendChild(checkbox);
     row.appendChild(button);
 
     if (warning) {
@@ -45,6 +55,20 @@ export function createLeagueList(leagueData, selectedLeagueId, onSelect, onWarni
         onWarningClick?.(league);
       });
       row.appendChild(warningButton);
+    }
+
+    if (!warning) {
+      const queryButton = document.createElement('button');
+      queryButton.type = 'button';
+      queryButton.className = 'league-query-button';
+      queryButton.setAttribute('aria-label', `Otwórz zapytanie Wikidata dla ligi ${league.name}`);
+      queryButton.title = 'Otwórz zapytanie Wikidata';
+      queryButton.textContent = 'ⓘ';
+      queryButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        onWarningClick?.(league);
+      });
+      row.appendChild(queryButton);
     }
 
     item.appendChild(row);
