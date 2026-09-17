@@ -221,6 +221,7 @@ function parseBindings(bindings) {
       stadium: stadium || null,
       capacity: capacity ?? null,
       coordinates: coord,
+      wikidataId: row?.stadium?.value ? row.stadium.value.replace('http://www.wikidata.org/entity/', '') : null,
       raw: row
     };
 

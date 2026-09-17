@@ -23,7 +23,14 @@ import {
   getLeagueQueryUrl
 } from './wikidata.js';
 import { createLeagueList, setStatusMessage, renderSearchResults, toggleSidebar } from './ui.js';
-import { initMap, renderMarkers, fitMapToStadiums } from './map.js';
+import {
+  initMap,
+  renderMarkers,
+  fitMapToStadiums,
+  getVisibleStadiumsForMap,
+  buildOsmExport,
+  buildOverpassTurboUrl
+} from './map.js';
 
 const state = {
   selectedLeagueIds: new Set(),
@@ -354,6 +361,49 @@ function bindUi() {
       renderLeagueList();
       renderCombinedLeagueData();
       setStatusMessage('Pamięć cache została wyczyszczona.');
+    });
+  }
+
+  const downloadButton = document.getElementById('download-osm-button');
+  if (downloadButton) {
+    downloadButton.addEventListener('click', () => {
+      const visible = getVisibleStadiumsForMap(map, state.currentLeagueData);
+      if (!visible.length) {
+        setStatusMessage('Brak widocznych stadionów do pobrania.', true);
+        return;
+      }
+
+      const xml = buildOsmExport(visible);
+      const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'stadiony-visible.osm';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setStatusMessage(`Pobrano ${visible.length} widocznych stadionów jako .osm.`);
+    });
+  }
+
+  const overpassButton = document.getElementById('overpass-query-button');
+  if (overpassButton) {
+    overpassButton.addEventListener('click', () => {
+      const visible = getVisibleStadiumsForMap(map, state.currentLeagueData);
+      if (!visible.length) {
+        setStatusMessage('Brak widocznych stadionów, do których można utworzyć zapytanie Overpass.', true);
+        return;
+      }
+
+      const url = buildOverpassTurboUrl(visible);
+      if (!url) {
+        setStatusMessage('Nie udało się przygotować zapytania Overpass.', true);
+        return;
+      }
+
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setStatusMessage(`Otwieram zapytanie Overpass dla ${visible.length} punktów.`);
     });
   }
 
