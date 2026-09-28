@@ -218,6 +218,48 @@ button:focus-visible,
   font-size: 0.95rem;
 }
 
+.league-presets {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.league-presets label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.league-presets select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 8px 9px;
+  font-size: 0.8rem;
+}
+
+.league-presets button {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-alt);
+  color: var(--text);
+  padding: 8px 9px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.league-presets button:hover {
+  border-color: rgba(28, 124, 219, 0.35);
+  background: var(--primary-soft);
+}
+
 .setting-option {
   display: flex;
   align-items: center;

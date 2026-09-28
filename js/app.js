@@ -1,7 +1,9 @@
-import { leagues } from './config.js';
+import { leagues, leaguePresets, sports } from './config.js';
 import {
   getCachedLeagueData,
   setCachedLeagueData,
+  getListedLeagueIds,
+  setListedLeagueIds,
   getLastSelectedLeague,
   setLastSelectedLeague,
   getCustomLeagues,
@@ -34,6 +36,7 @@ import {
 
 const state = {
   selectedLeagueIds: new Set(),
+  listedLeagueIds: new Set(getListedLeagueIds()),
   currentLeagueData: [],
   customSearchTimer: null,
   loadingPromises: new Map(),
@@ -64,15 +67,15 @@ function getLeagueDisplayData() {
 }
 
 async function selectLeague(leagueId, shouldSelect, { fromHash = false } = {}) {
-  let league = getLeagueById(leagueId);
+  const league = getLeagueById(leagueId);
   if (!league) {
     return;
   }
 
-  league = await loadLeagueMetadata(league);
-
   if (shouldSelect) {
     state.selectedLeagueIds.add(league.id);
+    state.listedLeagueIds.add(league.id);
+    setListedLeagueIds([...state.listedLeagueIds]);
     setLastSelectedLeague(league.id);
   } else {
     state.selectedLeagueIds.delete(league.id);
@@ -84,7 +87,9 @@ async function selectLeague(leagueId, shouldSelect, { fromHash = false } = {}) {
 
   renderLeagueList();
   if (shouldSelect) {
+    await loadLeagueMetadata(league);
     await loadLeagueData(league.id);
+    renderLeagueList();
   }
 
   renderCombinedLeagueData();
@@ -120,7 +125,7 @@ function openLeagueQueryInNewTab(league) {
 
 function renderLeagueList() {
   createLeagueList(
-    getLeagueDisplayData(),
+    getLeagueDisplayData().filter((league) => state.listedLeagueIds.has(league.id)),
     state.selectedLeagueIds,
     (leagueId, shouldSelect) => {
       selectLeague(leagueId, shouldSelect);
@@ -129,6 +134,60 @@ function renderLeagueList() {
       openLeagueQueryInNewTab(league);
     }
   );
+}
+
+function populateLeaguePresetOptions(sportId) {
+  const presetSelect = document.getElementById('league-preset-select');
+  if (!presetSelect) {
+    return;
+  }
+
+  presetSelect.replaceChildren();
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = sportId ? 'Wybierz zestaw lig' : 'Najpierw wybierz sport';
+  presetSelect.appendChild(placeholder);
+
+  leaguePresets
+    .filter((preset) => sportId === 'all' || preset.sport === sportId)
+    .forEach((preset) => {
+      const option = document.createElement('option');
+      option.value = preset.id;
+      option.textContent = preset.name;
+      presetSelect.appendChild(option);
+    });
+
+  presetSelect.disabled = !sportId;
+}
+
+function populateLeagueSportOptions() {
+  const sportSelect = document.getElementById('league-sport-select');
+  if (!sportSelect) {
+    return;
+  }
+
+  const placeholder = sportSelect.querySelector('option[value=""]');
+  sportSelect.replaceChildren(placeholder || new Option('Wybierz sport', ''));
+
+  sports.forEach((sport) => {
+    const option = document.createElement('option');
+    option.value = sport.id;
+    option.textContent = sport.name;
+    sportSelect.appendChild(option);
+  });
+
+  const allSportsOption = document.createElement('option');
+  allSportsOption.value = 'all';
+  allSportsOption.textContent = 'Wszystkie sporty';
+  sportSelect.appendChild(allSportsOption);
+}
+
+function resetLeaguePresetControls() {
+  const sportSelect = document.getElementById('league-sport-select');
+  if (sportSelect) {
+    sportSelect.value = '';
+  }
+  populateLeaguePresetOptions('');
 }
 
 async function loadLeagueData(leagueId) {
@@ -186,7 +245,7 @@ function renderCombinedLeagueData() {
 }
 
 function setHash(leagueIds) {
-  const nextHash = leagueIds.length ? `#${leagueIds.join(',')}` : '#';
+  const nextHash = leagueIds.length ? `#${leagueIds.join(',')}` : '#empty';
   if (window.location.hash !== nextHash) {
     window.location.hash = nextHash;
   }
@@ -197,8 +256,17 @@ async function handleHashChange() {
   const requestedIds = rawHash.split(',').filter(Boolean);
   const validIds = requestedIds.filter((leagueId) => getLeagueById(leagueId));
 
+  if (!rawHash || rawHash === 'empty') {
+    state.selectedLeagueIds = new Set();
+    renderLeagueList();
+    renderCombinedLeagueData();
+    return;
+  }
+
   if (validIds.length) {
     state.selectedLeagueIds = new Set(validIds);
+    validIds.forEach((leagueId) => state.listedLeagueIds.add(leagueId));
+    setListedLeagueIds([...state.listedLeagueIds]);
     renderLeagueList();
     await Promise.all(validIds.map((leagueId) => selectLeague(leagueId, true, { fromHash: true })));
     return;
@@ -297,6 +365,56 @@ function bindUi() {
   const settingsPanel = document.getElementById('settings-panel');
   const autoZoomToggle = document.getElementById('auto-zoom-toggle');
   const fullSearchToggle = document.getElementById('full-search-toggle');
+  const sportSelect = document.getElementById('league-sport-select');
+  const presetSelect = document.getElementById('league-preset-select');
+  const clearLeaguesButton = document.getElementById('clear-leagues-button');
+
+  if (sportSelect && presetSelect) {
+    populateLeagueSportOptions();
+    sportSelect.addEventListener('change', () => {
+      populateLeaguePresetOptions(sportSelect.value);
+    });
+
+    presetSelect.addEventListener('change', async () => {
+      const preset = leaguePresets.find(({ id }) => id === presetSelect.value);
+      if (!preset) {
+        return;
+      }
+
+      const leagueIds = preset.leagueIds.filter((leagueId) => getLeagueById(leagueId));
+      const addedLeagueIds = leagueIds.filter((leagueId) => !state.selectedLeagueIds.has(leagueId));
+      leagueIds.forEach((leagueId) => {
+        state.selectedLeagueIds.add(leagueId);
+        state.listedLeagueIds.add(leagueId);
+      });
+      setListedLeagueIds([...state.listedLeagueIds]);
+      setHash([...state.selectedLeagueIds]);
+      renderLeagueList();
+      renderCombinedLeagueData();
+      presetSelect.value = '';
+      await Promise.all(addedLeagueIds.map(async (leagueId) => {
+        await loadLeagueMetadata(getLeagueById(leagueId));
+        await loadLeagueData(leagueId);
+      }));
+      renderLeagueList();
+      renderCombinedLeagueData();
+    });
+
+    populateLeaguePresetOptions(sportSelect.value);
+  }
+
+  if (clearLeaguesButton) {
+    clearLeaguesButton.addEventListener('click', () => {
+      state.selectedLeagueIds = new Set();
+      state.listedLeagueIds = new Set();
+      setListedLeagueIds([]);
+      setHash([]);
+      resetLeaguePresetControls();
+      renderLeagueList();
+      renderCombinedLeagueData();
+      setStatusMessage('Lista lig została wyczyszczona.');
+    });
+  }
 
   if (toggleButton) {
     toggleButton.addEventListener('click', () => {
@@ -357,7 +475,10 @@ function bindUi() {
       clearLeagueCache();
       clearCustomLeagues();
       state.selectedLeagueIds = new Set();
+      state.listedLeagueIds = new Set();
       state.currentLeagueData = [];
+      setHash([]);
+      resetLeaguePresetControls();
       renderLeagueList();
       renderCombinedLeagueData();
       setStatusMessage('Pamięć cache została wyczyszczona.');
@@ -426,6 +547,11 @@ function initialize() {
   bindUi();
   renderLeagueList();
   toggleSidebar(window.innerWidth > 780);
+
+  if (window.location.hash === '#') {
+    handleHashChange();
+    return;
+  }
 
   const currentHash = window.location.hash.replace(/^#/, '');
   const lastSelected = getLastSelectedLeague();
