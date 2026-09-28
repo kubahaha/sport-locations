@@ -1,6 +1,6 @@
 const football = {
   id: 'football',
-  name: 'Piłka nożna',
+  name: '⚽ Piłka nożna',
   leagues: [
     { name: 'Liga Mistrzów UEFA', wikidataId: 'Q140455348', participants: 36 },
     { name: 'Liga Europy UEFA', wikidataId: 'Q140478672', participants: 36 },
@@ -64,13 +64,14 @@ const football = {
 
 const speedway = {
   id: 'speedway',
-  name: 'Żużel',
+  name: '🏍️ Żużel',
   leagues: [
     { name: 'Speedway Ekstraliga', wikidataId: 'Q141451656', participants: 8 },
     { name: 'Speedway 2. Ekstraliga', wikidataId: 'Q141578791', participants: 8 },
     { name: 'Krajowa Liga Żużlowa', wikidataId: 'Q141579509', participants: 7 },
     { name: 'Premiership na żużlu (UK)', wikidataId: 'Q137921350', participants: 6 },
-    { name: 'Championship na żużlu (UK)', wikidataId: 'Q137921371', participants: 9 }
+    { name: 'Championship na żużlu (UK)', wikidataId: 'Q137921371', participants: 9 },
+    { name: 'Danish Speedway League (DK)', wikidataId: 'Q139414300', participants: 8 }
   ],
   presets: [
     {
@@ -80,15 +81,20 @@ const speedway = {
     },
     {
       id: 'speedwayuk',
-      name: 'Wszystkie brytyjskie ligi żużlowe',
+      name: 'Brytyjskie ligi żużlowe',
       wikidataIds: ['Q137921350', 'Q137921371']
-    }
+    },
+    {
+      id: 'speedwaydk',
+      name: 'Duńskie ligi żużlowe',
+      wikidataIds: ['Q139414300']
+    },
   ]
 };
 
 const volleyball = {
   id: 'volleyball',
-  name: 'Siatkówka',
+  name: '🏐 Siatkówka',
   leagues: [
     { name: 'Tauron Liga (mężczyźni)', wikidataId: 'Q141451817', participants: 14 },
     { name: 'Tauron Liga (kobiety)', wikidataId: 'Q141591599', participants: 12 }
@@ -109,7 +115,7 @@ const volleyball = {
 
 const hockey = {
   id: 'hockey',
-  name: 'Hokej na lodzie',
+  name: '🏒 Hokej na lodzie',
   leagues: [
     { name: 'Polska Hokej Liga', wikidataId: 'Q141591569', participants: 10 }
   ],
@@ -122,7 +128,28 @@ const hockey = {
   ]
 };
 
-export const sports = [football, speedway, volleyball, hockey];
+const basketball = {
+  id: 'basketball',
+  name: '🏀 Koszykówka',
+  leagues: [
+    { name: 'Polska Liga Koszykówki', wikidataId: 'Q141453475', participants: 16 },
+    { name: 'Basket Liga Kobiet', wikidataId: 'Q141591949', participants: 13 }
+  ],
+  presets: [
+    {
+      id: 'basketball1',
+      name: 'koszykówka mężczyzn w Polsce',
+      wikidataIds: ['Q141453475']
+    },
+    {
+      id: 'basketball1',
+      name: 'koszykówka kobiet w Polsce',
+      wikidataIds: ['Q141591949']
+    },
+  ]
+};
+
+export const sports = [football, speedway, volleyball, hockey, basketball];
 
 function leagueIdFromWikidataId(wikidataId) {
   return wikidataId;
