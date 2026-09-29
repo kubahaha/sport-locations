@@ -15,9 +15,16 @@ const football = {
     { name: '4. Liga (grupa dolnośląska)', wikidataId: 'Q141493028', participants: 18 },
     { name: '4. Liga (grupa kujawsko-pomorska)', wikidataId: 'Q141508273', participants: 18 },
     { name: '4. Liga (grupa lubelska)', wikidataId: 'Q141416127', participants: 16 },
+    { name: '4. Liga (grupa lubuska)', wikidataId: 'Q141592544', participants: 18 },
     { name: '4. Liga (grupa świętokrzyska)', wikidataId: 'Q141488142', participants: 18 },
     { name: '4. Liga (grupa małopolska)', wikidataId: 'Q141466233', participants: 18 },
     { name: '4. Liga (grupa podkarpacka)', wikidataId: 'Q141467987', participants: 18 },
+    { name: '4. Liga (grupa łódzka)', wikidataId: 'Q141594118', participants: 18 },
+    { name: '4. Liga (grupa mazowiecka)', wikidataId: 'Q141594412', participants: 18 },
+    { name: '4. Liga (grupa opolska)', wikidataId: 'Q141596973', participants: 14 },
+    { name: '4. Liga (grupa podlaska)', wikidataId: 'Q141597608', participants: 16 },
+    { name: '4. Liga (grupa pomorska)', wikidataId: 'Q141597948', participants: 18 },
+    { name: '4. Liga (grupa warmińsko-mazurska)', wikidataId: 'Q141598642', participants: 16 },
     { name: 'Klasa okręgowa (grupa lubelska)', wikidataId: 'Q141417681', participants: 14 },
     { name: 'Klasa okręgowa (grupa bielskopodlaska)', wikidataId: 'Q141431068', participants: 16 },
     { name: 'Klasa okręgowa (grupa chełmska)', wikidataId: 'Q141431646', participants: 14 },
@@ -42,7 +49,7 @@ const football = {
     {
       id: 'fourth-division',
       name: '4. liga',
-      wikidataIds: ['Q141493028', 'Q141508273', 'Q141416127', 'Q141488142', 'Q141466233', 'Q141467987']
+      wikidataIds: ['Q141493028', 'Q141508273', 'Q141416127', 'Q141488142', 'Q141466233', 'Q141467987', 'Q141592544', 'Q141594118', 'Q141594412', 'Q141596973', 'Q141597608', 'Q141598642']
     },
     {
       id: 'regional-soccer',
