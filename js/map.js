@@ -198,6 +198,15 @@ function buildPopup(stadium) {
   const clubName = stadium?.club || 'Nieznany klub';
   const capacity = formatCapacity(stadium?.capacity);
   const league = stadium?.leagueName;
+  const coordinates = stadium?.coordinates;
+  const hasCoordinates = Array.isArray(coordinates) && coordinates.length === 2 &&
+    Number.isFinite(coordinates[0]) && Number.isFinite(coordinates[1]);
+  const mapLinks = hasCoordinates
+    ? `<div class="popup-map-links">
+        <a href="https://www.openstreetmap.org/?mlat=${coordinates[0]}&amp;mlon=${coordinates[1]}#map=17/${coordinates[0]}/${coordinates[1]}" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=${coordinates[0]}%2C${coordinates[1]}" target="_blank" rel="noopener noreferrer">Google Maps</a>
+      </div>`
+    : '';
 
   const content = `
     <div>
@@ -205,6 +214,7 @@ function buildPopup(stadium) {
       ${league ? `<div class="popup-row"><strong>Liga:</strong> ${escapeHtml(league)}</div>` : ''}
       <div class="popup-row"><strong>Klub:</strong> ${escapeHtml(clubName)}</div>
       ${capacity ? `<div class="popup-row"><strong>Pojemność:</strong> ${escapeHtml(capacity)}</div>` : ''}
+      ${mapLinks}
     </div>
   `;
 

@@ -25,6 +25,7 @@ const football = {
     { name: '4. Liga (grupa podlaska)', wikidataId: 'Q141597608', participants: 16 },
     { name: '4. Liga (grupa pomorska)', wikidataId: 'Q141597948', participants: 18 },
     { name: '4. Liga (grupa warmińsko-mazurska)', wikidataId: 'Q141598642', participants: 16 },
+    { name: '4. Liga (grupa śląska)', wikidataId: 'Q141599287', participants: 18 },
     { name: 'Klasa okręgowa (grupa lubelska)', wikidataId: 'Q141417681', participants: 14 },
     { name: 'Klasa okręgowa (grupa bielskopodlaska)', wikidataId: 'Q141431068', participants: 16 },
     { name: 'Klasa okręgowa (grupa chełmska)', wikidataId: 'Q141431646', participants: 14 },

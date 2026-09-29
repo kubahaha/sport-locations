@@ -33,24 +33,32 @@ LAST	P625	@50.892778/21.659374
 ### Dodaj brakujące kluby
 
 ```csv
-qid,Lpl,Dpl,P17,P31,P641,P452,P118
-,"Piast Żmigród","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"GKS Raciborowice","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"Chrobry II Głogów","polski klub sportowy, zespół rezerw Chrobrego Głogów",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"GKS Mirków/Długołęka","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"Błyskawica Gać","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"WKS Wierzbice","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"Polonia Bielany Wrocławskie","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"Polonia Środa Śląska","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"AKS Strzegom","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"Iskra Księginice","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"Odra Ścinawa","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
-,"Prochowiczanka Prochowice","polski klub sportowy",Q36,Q847017,Q2736,Q124022875,Q2403778
+drużyna, label, desc, państwo, jest to, sport, liga
+qid,Lpl,Dpl,P17,P31,P641,P118
+,"Odra Nietków","polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+,"Ilanka Rzepin","polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+,"","polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+,"","polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+
+drużyna, desc, państwo, jest to, sport, liga
+qid,Dpl,P17,P31,P641,P118
+Q60854771,"polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+Q11821067,"polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+,"polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+,"polski klub piłkarski",Q36,Q847017,Q2736,Q11710567
+
+drużyna, państwo, jest to, sport, liga
+qid,P17,P31,P641,P118
+Q2086814,Q36,Q847017,Q2736,Q11710567
+Q1091780,Q36,Q847017,Q2736,Q11710567
+,Q36,Q847017,Q2736,Q11710567
+,Q36,Q847017,Q2736,Q11710567
 ```
 
 ### Dodaj kluby do ligi
 
 ```csv
+liga,zespół biorący udział
 qid,P1923
 Q141493028,Q141493072
 Q141493028,Q141493071
@@ -69,23 +77,23 @@ Q141493028,Q141493058
 ### Dodaj brakujące stadiony
 
 ```csv
-qid,Lpl,Dpl,P17,P31,P625,P466,P1083
-,"Boczne boisko Chrobrego Głogów","boisko piłkarskie w Głogowie, Polska",Q36,Q1154710,@51.655950/16.098769,Q141493062,924
-,"Stadion Miejski OSiR Strzegom","stadion sportowy w Strzegomiu, Polska",Q36,Q483110,@50.971231/16.352377,Q141493069,400
-,"Stadion Miejski w Gaci","stadion sportowy w Gaci, Polska",Q36,Q1154710,@50.887462/17.368816,Q141493064,600
-,"Stadion Miejski w Złotoryi","stadion sportowy w Złotoryi, Polska",Q36,Q1154710,@51.126327/15.905575,Q86659642,1000
-,"Stadion w Księginicach","stadion sportowy w Księginicach, Polska",Q36,Q483110,@51.405865/16.273938,Q141493070,200
-,"Stadion Miejski w Ścinawie","stadion sportowy w Ścinawie, Polska",Q36,Q483110,@51.409151/16.436588,Q141493071,535
-,"Stadion OSiR w Ząbkowicach Śląskich","stadion sportowy w Ząbkowicach Śląskich, Polska",Q36,Q483110,@50.594251/16.827160,Q11799414,2500
-,"Stadion OSiR w Żmigrodzie","stadion sportowy w Żmigrodzie, Polska",Q36,Q483110,@51.471293/16.917368,Q141493058,900
-,"Stadion Miejski OSiR Środa Śląska","stadion sportowy w Środzie Śląskiej, Polska",Q36,Q483110,@51.168594/16.604762,Q141493067,500
-,"Stadion Prochowiczanka","stadion sportowy w Prochowicach, Polska",Q36,Q483110,@:51.273031/16.372343,Q141493072,1000
-,"Boisko w Wierzbicahc","stadion sportowy w Wierzbicach, Polska",Q36,Q483110,@50.951472/16.896662,Q141493065,350
+stadion,Label,desc,państwo,jest to,sport,współrzędne,użytkownik,liczba miejsc
+qid,Lpl,Dpl,P17,P31,P641,P625,P466,P1083
+,"Stadion Miejski w Strzelcach Krajeńskich","stadion sportowy w Strzelcach Krajeńskich, Polska",Q36,Q483110,Q2736,@52.881621/15.519948,Q9394516,776
+
+stadion,desc,państwo,jest to,sport,użytkownik,liczba miejsc
+qid,Dpl,P17,P31,P641,P466,P1083
+Q9341190,"boisko piłkarskie w Szprotawie, Polska",Q36,Q483110,Q2736,Q60854771,1500
+
+stadion,państwo,jest to,sport,użytkownik,liczba miejsc
+qid,P17,P31,P641,P466,P1083
+Q139806084,Q36,Q483110,Q2736,Q935163,2000
 ```
 
 ### Przypisz stadiony klubom
 
 ```csv
+klub,stadion
 qid,P115
 Q141493066,Q141501492
 Q141493060,Q141501491

@@ -518,6 +518,26 @@ button:focus-visible,
   color: var(--text);
 }
 
+.popup-map-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 9px;
+  padding-top: 7px;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.popup-map-links a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.popup-map-links a:hover,
+.popup-map-links a:focus-visible {
+  text-decoration: underline;
+}
+
 @media (max-width: 780px) {
   .app-shell {
     position: relative;
